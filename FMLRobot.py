@@ -114,8 +114,10 @@ class FMLRobot:
         # read motor veloctiy until zero --> robot stands -> we can return from the function
         while self.BP.get_motor_status(self.left_motor)[3] != 0:
             time.sleep(0.02)
-        
 
+        self.update_position()
+        
+        
     # To be implemented in 1.1
     def drive(self, distance):
         # needed motor rotation to achieve movement
@@ -129,6 +131,8 @@ class FMLRobot:
         # read motor veloctiy until zero --> robot stands -> we can return from the function
         while self.BP.get_motor_status(self.left_motor)[3] != 0:
             time.sleep(0.02)
+
+        self.update_position()
         
 
     # To be implemented in 2.1
