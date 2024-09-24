@@ -29,7 +29,7 @@ class FMLRobot:
 
     # To be implemented in 01 - Kinematik
     def _init_kinematik(self):
-        self.wheel_radius = 0.0345 # m
+        self.wheel_radius = 0.0691/2.0 # m
         self.wheel_distance = 0.165 # m
         self.wheel_circumference = 2*np.pi*self.wheel_radius # m 
         self.gear_ratio = 24.0/8.0 # teeth_wheel/teeth_motor
