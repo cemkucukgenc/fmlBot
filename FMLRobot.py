@@ -70,27 +70,27 @@ class FMLRobot:
         encdelta_right =  new_encoder_right-self.encoder_right 
         encdelta_left = new_encoder_left- self.encoder_left
         #calculating driven distance
-        dis_right = None
-        dis_left = None
+        dis_right = encdelta_right*self.wheel_circumference/(360*self.gear_ratio)
+        dis_left = encdelta_left*self.wheel_circumference/(360*self.gear_ratio)
         # update the encoder values 
-        self.encoder_left = None
-        self.encoder_right = None
+        self.encoder_left = new_encoder_left
+        self.encoder_right = new_encoder_right
 
         return (dis_left,dis_right) # delta s_r delta s_l
     
     # odometrie
     def update_position(self):
         delta_s_left, delta_s_right = self.get_distance_from_encoder()
-        delta_s = None
+        delta_s = (delta_s_right + delta_s_left)/2.0
 
-        delta_x = None
-        delta_y = None
-        delta_phi = None
+        delta_x = delta_s * math.cos(self.position[2])
+        delta_y = delta_s * math.sin(self.position[2])
+        delta_phi = (delta_s_right - delta_s_left) / self.wheel_distance
         
         # update the position
-        self.position[0]= None # X
-        self.position[1]= None # Y
-        self.position[2]= None # phi
+        self.position[0] += delta_x # X
+        self.position[1] += delta_y # Y
+        self.position[2] += delta_phi # phi
         
     
     def stop(self):
