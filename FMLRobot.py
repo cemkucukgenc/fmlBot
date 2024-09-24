@@ -29,13 +29,13 @@ class FMLRobot:
 
     # To be implemented in 01 - Kinematik
     def _init_kinematik(self):
-        self.wheel_radius = 0
-        self.wheel_distance = 0
-        self.wheel_circumference = 0
-        self.gear_ratio = # teeth_wheel/teeth_motor
+        self.wheel_radius = 0.0345 # m
+        self.wheel_distance = 0.165 # m
+        self.wheel_circumference = 2*np.pi*self.wheel_radius # m 
+        self.gear_ratio = 24.0/8.0 # teeth_wheel/teeth_motor
         
         # global position of the robot within the coordinate system [x,y,phi]
-        self.position = None 
+        self.position = np.array([0,0,0]) 
         
         # last encoder values are saved in the object (read out the encoder when starting the robot)
         self.encoder_left = self.BP.get_motor_encoder(self.left_motor)
@@ -101,8 +101,9 @@ class FMLRobot:
     # To be implemented in 1.1
     def turn(self,degree):
         # needed motor rotation to achieve movement 
-        deg_right = 0
-        deg_left = 0
+        deg = degree * np.pi * self.gear_ratio * self.wheel_distance / self.wheel_circumference
+        deg_right = -deg
+        deg_left = deg
         #turning
         self.BP.set_motor_position_relative(self.left_motor, deg_left)
         self.BP.set_motor_position_relative(self.right_motor, deg_right)
@@ -118,7 +119,7 @@ class FMLRobot:
     # To be implemented in 1.1
     def drive(self, distance):
         # needed motor rotation to achieve movement
-        delta_angle = 0
+        delta_angle = (distance * self.gear_ratio * 360) / self.wheel_circumference
         # add angle to current motor position
         self.BP.set_motor_position_relative(self.left_motor, delta_angle)
         self.BP.set_motor_position_relative(self.right_motor, delta_angle)
