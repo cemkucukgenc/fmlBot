@@ -140,6 +140,7 @@ class FMLRobot:
         try:
             # read sensor 
             distance = self.BP.get_sensor(self.front_sensor)
+            distance = distance + 1 # Distance correction
         except brickpi3.SensorError as error:
             # Default wert
             distance = -1 # defaults to None
