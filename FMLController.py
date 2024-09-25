@@ -7,8 +7,8 @@ class PController:
         self.target_value = target_value
     
     def get_u(self,current_value):
-        error = None # Compute error
-        u = None # compute u
+        error = self.target_value - current_value # Compute error
+        u = self.kp * error # compute u
         return u
 
 
@@ -24,9 +24,9 @@ class PIController:
     def get_u(self,current_value):
         now = time.time()
         self.dt = self.last_call - now
-        error = None # compute error 
-        self.integral += None # Update integral value
-        u = None # Compute U from P and I portion
+        error = self.target_value - current_value # Compute error
+        self.integral += error * self.dt # Update integral value
+        u = self.kp * error + self.ki * self.integral # Compute U from P and I portion
         # Update time for next call
         self.last_call = now
         return u

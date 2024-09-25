@@ -197,10 +197,14 @@ class FMLRobot:
     ## Followers:
     def follower_line(self, velocity, controller):
         while True:
-            # TODO Get reflected light of right sensor
-            current_sensor_value = None
-            # TODO Calculate steering using Controller algorithm
-            u = 0
+            try:
+                # Get reflected light of right sensor
+                current_sensor_value = self.BP.get_sensor(self.rigth_sensor)
+            except brickpi3.SensorError as error:
+                print(f"Error during sensor reading: {error}")
+                continue
+            # Calculate steering using Controller algorithm
+            u = controller.get_u(current_sensor_value)
             
             # Limit u to 500
             if velocity + abs(u) > 500:
