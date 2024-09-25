@@ -117,7 +117,7 @@ class FMLRobot:
 
         self.update_position()
         
-        
+
     # To be implemented in 1.1
     def drive(self, distance):
         # needed motor rotation to achieve movement
@@ -150,7 +150,7 @@ class FMLRobot:
     # To be implemented in 2.1
     def get_color_left(self):
         try:
-            color = None #TODO Read in sensor
+            color = self.BP.get_sensor(self.left_sensor) # Read in sensor
         # If brickpy sensor throws error set default value
         except brickpi3.SensorError as error:
             color = None # Default Value and print error
@@ -161,7 +161,7 @@ class FMLRobot:
     # To be implemented in 2.1    
     def get_color_right(self):
         try:
-            color = None #TODO Read in sensor
+            color = self.BP.get_sensor(self.rigth_sensor) # Read in sensor
         except brickpi3.SensorError as error:
             color = None 
             print(f"Error during get_color_right(): {error}")
@@ -229,3 +229,4 @@ class FMLRobot:
 
        
         
+
