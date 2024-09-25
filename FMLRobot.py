@@ -174,16 +174,16 @@ class FMLRobot:
 
     # To be implemented in 2.3g
     def lift_fork(self):
-        self.move_fork(1)
+        self.move_fork(1080)
 
 
      # To be implemented in 2.3
     def drop_fork(self):
-        self.move_fork(-1)
+        self.move_fork(-1080)
 
     # to be implemented in 2.3
     def move_fork(self,degrees):
-        # TODO Move fork motor
+        self.BP.set_motor_position_relative(self.fork_motor, degrees) # Move fork motor
         # wait on the motor and check if it finished moving
         time.sleep(0.4)
         # read motor veloctiy until zero --> fork lift at position
