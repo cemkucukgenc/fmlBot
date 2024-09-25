@@ -162,7 +162,7 @@ class FMLRobot:
     # To be implemented in 2.1    
     def get_color_right(self):
         try:
-            color = self.BP.get_sensor(self.rigth_sensor) # Read in sensor
+            color = self.BP.get_sensor(self.right_sensor) # Read in sensor
         except brickpi3.SensorError as error:
             color = None 
             print(f"Error during get_color_right(): {error}")
@@ -198,30 +198,52 @@ class FMLRobot:
     def follower_line(self, velocity, controller):
         while True:
             try:
-                # Get reflected light of right sensor
-                current_sensor_value = self.BP.get_sensor(self.rigth_sensor)
+                # Get reflected light from the right sensor for line tracking
+                current_sensor_value = self.BP.get_sensor(self.right_sensor)
+                
+                # Get the color detected by the left sensor (for checking ground)
+                ground_color = self.BP.get_sensor(self.left_sensor)
+                
+                if not (ground_color == 0 or ground_color == 1 or ground_color == 6):
+                    print(f"Non-black/white ground detected (color code: {ground_color}). Stopping.")
+                    self.stop()
+                    break
+
+                # Check if an obstacle is detected by the front distance sensor
+                front_distance = self.get_distance_front()
+                if front_distance != -1 and front_distance < 10:  # Stop if the obstacle is too close
+                    print("Obstacle detected. Stopping.")
+                    self.stop()
+                    self.drop_fork()
+                    time.sleep(0.5)
+                    self.lift_fork()
+                    time.sleep(0.5)
+                    break
+
+                # Calculate steering using the Controller algorithm
+                u = controller.get_u(current_sensor_value)
+                
+                # Limit u to 500
+                if velocity + abs(u) > 500:
+                    if u >= 0:
+                        u = 500 - velocity
+                    else:
+                        u = velocity - 500
+
+                # Run motors with correction
+                if u >= 0:
+                    self.BP.set_motor_dps(self.right_motor, velocity - abs(u))
+                    self.BP.set_motor_dps(self.left_motor, velocity + abs(u))
+                else:
+                    self.BP.set_motor_dps(self.right_motor, velocity + abs(u))
+                    self.BP.set_motor_dps(self.left_motor, velocity - abs(u))
+                
+                time.sleep(0.01)
+
             except brickpi3.SensorError as error:
                 print(f"Error during sensor reading: {error}")
                 continue
-            # Calculate steering using Controller algorithm
-            u = controller.get_u(current_sensor_value)
-            
-            # Limit u to 500
-            if velocity + abs(u) > 500:
-                if u >= 0:
-                    u = 500 - velocity
-                else:
-                    u = velocity - 500
 
-            # Run motors with correction
-            if u >= 0:
-                self.BP.set_motor_dps(self.right_motor,velocity - abs(u))
-                self.BP.set_motor_dps(self.left_motor,velocity + abs(u))
-            else:
-                self.BP.set_motor_dps(self.right_motor,velocity + abs(u))
-                self.BP.set_motor_dps(self.left_motor,velocity - abs(u))
-            
-            time.sleep(0.01)
         
     
     def follower_distance(self, velocity, controller, colors_to_stop=[]):
