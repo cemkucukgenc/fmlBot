@@ -5,7 +5,7 @@ from FMLRobot import FMLRobot
 from FMLController import PIController
 import time
 
+robot = FMLRobot()
 
-pi_controller = PIController(kp=0,ki=0,target_value=30.0)
-with FMLRobot() as robot:
-    robot.follower_line(velocity=200,controller=pi_controller)
+controller = PIController(7.0,0.02,30.0)
+print(robot.follower_line(200,controller))
