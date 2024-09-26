@@ -27,24 +27,39 @@ def teleop(stdscr):
     stdscr.keypad(True)   # Enable arrow keys
     
     with FMLRobot() as robot:
+        state = 1 # up
         while True:
             key = stdscr.getch()  # Get key press
 
             if key == curses.KEY_UP:
                 stdscr.addstr(len(instructions) + 1, 0, "Moving forward      ")
                 # Move forward DISTANCE meters
+                robot.drive(DISTANCE)
             elif key == curses.KEY_DOWN:
                 stdscr.addstr(len(instructions) + 1, 0, "Moving backward     ")
                 # Move backward DISTANCE meters
+                robot.drive(-DISTANCE)
             elif key == curses.KEY_LEFT:
                 stdscr.addstr(len(instructions) + 1, 0, "Turning left        ")
                 # Turn ANGLE degrees to the left
+                robot.turn(-ANGLE)
             elif key == curses.KEY_RIGHT:
                 stdscr.addstr(len(instructions) + 1, 0, "Turning right       ")
                 # Turn ANGLE degrees to the right
+                robot.turn(ANGLE)
+            elif key == ord('u') and state == 0:
+                stdscr.addstr(len(instructions) + 1, 0, "Lifting up       ")
+                robot.lift_fork()
+                state = 1
+            elif key == ord('d') and state == 1:
+                stdscr.addstr(len(instructions) + 1, 0, "Dropping down       ")
+                robot.drop_fork()
+                state = 0
+
             elif key == ord('q'):
                 stdscr.addstr(len(instructions) + 1, 0, "Exiting teleop mode.")
                 break
+
             stdscr.refresh()
 
 if __name__ == "__main__":
