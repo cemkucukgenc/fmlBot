@@ -6,4 +6,4 @@ from FMLController import PIController
 
 
 with FMLRobot() as robot:
-    robot.bypass_obstacle()
+    robot.follower_distance()
