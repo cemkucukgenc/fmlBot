@@ -35,7 +35,7 @@ class FMLRobot:
         self.gear_ratio = 24.0/8.0 # teeth_wheel/teeth_motor
         
         # global position of the robot within the coordinate system [x,y,phi]
-        self.position = np.array([0,0,0]) 
+        self.position = np.array([0.0, 0.0, 0.0]) 
         
         # last encoder values are saved in the object (read out the encoder when starting the robot)
         self.encoder_left = self.BP.get_motor_encoder(self.left_motor)

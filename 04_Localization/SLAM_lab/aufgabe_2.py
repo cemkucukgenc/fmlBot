@@ -19,9 +19,9 @@ turning = False
 map = np.full((GRID_SIZE, GRID_SIZE), 0.5)  # 0.5 means unknown
 
 # Robot starting position
-x_robot_0 = None
-y_robot_0 = None
-phi_robot_0 = None
+x_robot_0 = 2
+y_robot_0 = 2
+phi_robot_0 = 0
 
 x = list() # Start x coordinate list
 y = list() # Start y coordinate list
@@ -35,14 +35,13 @@ def update_map(robot, turning):
     # The robot odometry system starts its pose in x,y,phi = 0 
     # But the initial robot coordinates are given by x_robot_0, y_robot_0, phi_robot_0
     # Calculate the new robot pose by adding the odometry pose to the initial pose
-    robot_odom_pose_x = None # Hint: The object robot has a member call position that contains the updated odometry values [x, y, phi]  
-    robot_odom_pose_y = None
-    robot_odom_pose_phi = None
+    robot_odom_pose_x = robot.position[0]# Hint: The object robot has a member call position that contains the updated odometry values [x, y, phi]  
+    robot_odom_pose_y = robot.position[1]
+    robot_odom_pose_phi = robot.position[2]
     
     robot_x = x_robot_0 + robot_odom_pose_x
     robot_y = y_robot_0 + robot_odom_pose_y
     robot_phi = phi_robot_0 + robot_odom_pose_phi
-
     x.append(robot_x)
     y.append(robot_y)
 
