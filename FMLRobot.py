@@ -148,6 +148,19 @@ class FMLRobot:
     
         return distance
     
+    def get_distance_right(self):
+        try:
+            # read sensor 
+            distance = self.BP.get_sensor(self.right_sensor)
+            distance = distance + 1 # Distance correction
+        except brickpi3.SensorError as error:
+            # Default wert
+            distance = -1 # defaults to None
+            print(f"Error during get_distance_front(): {error}")
+
+        return distance
+
+    
     # To be implemented in 2.1
     def get_color_left(self):
         try:

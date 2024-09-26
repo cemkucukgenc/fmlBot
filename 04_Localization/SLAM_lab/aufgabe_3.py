@@ -22,9 +22,9 @@ turning = False
 map = np.full((GRID_SIZE, GRID_SIZE), 0.5)  # 0.5 means unknown
 
 # Robot starting position in map
-x_robot_0 = None
-y_robot_0 = None
-phi_robot_0 = None
+x_robot_0 = 2
+y_robot_0 = 2
+phi_robot_0 = 0
 
 x = list() # Start x coordinate list
 y = list() # Start y coordinate list
@@ -37,17 +37,19 @@ def update_map(robot, turning):
     # The robot odometry system starts its pose in x,y,phi = 0 
     # But the initial robot coordinates are given by x_robot_0, y_robot_0, phi_robot_0
     # Calculate the new robot pose by adding the odometry pose to the initial pose
-    robot_odom_pose_x = None # Hint: The object robot has a member call position that contains the updated odometry values [x, y, phi]  
-    robot_odom_pose_y = None
-    robot_odom_pose_phi = None
+    robot_odom_pose_x = robot.position[0]# Hint: The object robot has a member call position that contains the updated odometry values [x, y, phi]  
+    robot_odom_pose_y = robot.position[1]
+    robot_odom_pose_phi = robot.position[2]
     
     robot_x = x_robot_0 + robot_odom_pose_x
     robot_y = y_robot_0 + robot_odom_pose_y
     robot_phi = phi_robot_0 + robot_odom_pose_phi
+    x.append(robot_x)
+    y.append(robot_y)
 
     # The sensor phi is located pi/2 radians to the right of the robot
     # so its orientation is the orientation of the robot - pi/2 
-    sensor_phi = None
+    sensor_phi = robot_phi-np.pi/2
 
     # Mapping =  get distance with ultrasonic sensor in the current position
     right_distance = round(robot.get_distance_right()/10) # Distance to the obstacle in dm
@@ -57,16 +59,22 @@ def update_map(robot, turning):
     max_x = round(max(0, obstacle_x)) # The x coordinate for the obstacle should be limited between 0 and the obstacle coordinate
     max_y = round(max(0, obstacle_y)) # The y coordinate for the obstacle should be limited between 0 and the obstacle coordinate
 
+    # Convert floating-point values to integers for the range function
+    int_robot_x = int(robot_x)
+    int_robot_y = int(robot_y)
+    int_max_x = int(max_x)
+    int_max_y = int(max_y)
+    
     # Iterate the map until the obstacle position to clear the path until the obstacle
     if not turning:
-        for i_y in range(min(obstacle_y, max_y), max(obstacle_y, max_y)+ 1):
-            for i_x in range(min(robot_x, max_x), max(robot_x, max_x) + 1):   
+        for i_y in range(min(int_robot_y, int_max_y), max(int_robot_y, int_max_y) + 1):
+            for i_x in range(min(int_robot_x, int_max_x), max(int_robot_x, int_max_x) + 1):   
                 # If the cell is unknown or an obstacle:        
                 if map[i_y][i_x] == 0.5:
-                    map[i_y][i_x] = 1.0 # clear the cell
+                    map[i_y][i_x] = 1.0  # Clear the cell
 
         # Make the obstacle cell equal to 0 
-        map[max_y][max_x] = 0.0
+        map[int_max_y][int_max_x] = 0.0
 
     # Update the map.
     save_map(map)
