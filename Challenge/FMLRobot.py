@@ -119,7 +119,11 @@ class FMLRobot:
         
 
     # To be implemented in 1.1
-    def drive(self, distance):
+    def drive(self, distance, velocity):
+
+        self.BP.set_motor_dps(self.right_motor, velocity)
+        self.BP.set_motor_dps(self.left_motor, velocity)
+
         # needed motor rotation to achieve movement
         delta_angle = (distance * self.gear_ratio * 360) / self.wheel_circumference
         # add angle to current motor position
@@ -212,29 +216,15 @@ class FMLRobot:
         while True:
             try:
                 # Get reflected light from the right sensor for line tracking
-                current_sensor_value = self.BP.get_sensor(self.right_sensor)
+                ground_cam_right = self.BP.get_sensor(self.right_sensor)
                 
-                # Get the color detected by the left sensor (for checking ground)
-                ground_color = self.BP.get_sensor(self.left_sensor)
-                
-                if not (ground_color == 0 or ground_color == 1 or ground_color == 6):
-                    print(f"Non-black/white ground detected (color code: {ground_color}). Stopping.")
-                    self.stop()
-                    break
-
-                # Check if an obstacle is detected by the front distance sensor
-                front_distance = self.get_distance_front()
-                if front_distance != -1 and front_distance < 10:  # Stop if the obstacle is too close
-                    print("Obstacle detected. Stopping.")
-                    self.stop()
-                    self.drop_fork()
-                    time.sleep(0.5)
-                    self.lift_fork()
-                    time.sleep(0.5)
-                    break
+                # if not (ground_cam_left == 0 or ground_cam_left == 1 or ground_cam_left == 6):
+                #     print(f"Non-black/white ground detected (color code: {ground_cam_left}). Stopping.")
+                #     self.stop()
+                #     break
 
                 # Calculate steering using the Controller algorithm
-                u = controller.get_u(current_sensor_value)
+                u = controller.get_u(ground_cam_right)
                 
                 # Limit u to 500
                 if velocity + abs(u) > 500:
@@ -266,15 +256,15 @@ class FMLRobot:
                 try:
                     # Track the black line using the follower_line logic until an obstacle is detected
                     front_distance = self.get_distance_front()
-                    current_sensor_value = self.BP.get_sensor(self.right_sensor)
-                    ground_color = self.get_color_left()
+                    ground_cam_right = self.BP.get_sensor(self.right_sensor)
+                    ground_cam_left = self.get_color_left()
 
                     if front_distance != -1 and front_distance <= 12:  # Stop if an obstacle is detected 12cm ahead
                         print("Obstacle detected 12cm ahead. Preparing to bypass.")
                         self.stop()
                         break
 
-                    u = controller_line_following.get_u(current_sensor_value)
+                    u = controller_line_following.get_u(ground_cam_right)
                     # Limit u to 500
                     if velocity + abs(u) > 500:
                         if u >= 0:
@@ -324,15 +314,15 @@ class FMLRobot:
                 try:
                     side_distance = self.get_distance_side()
 
-                    current_sensor_value = self.BP.get_sensor(self.right_sensor)
-                    ground_color = self.get_color_left()
+                    ground_cam_right = self.BP.get_sensor(self.right_sensor)
+                    ground_cam_left = self.get_color_left()
 
 
-                    # print('right: {}, left: {}'.format(current_sensor_value, ground_color))
+                    # print('right: {}, left: {}'.format(ground_cam_right, ground_cam_left))
                     
 
                     # Check if the ground color is black to transition back to line following
-                    if ground_color == "Black":
+                    if ground_cam_left == "Black":
                         print("Black line detected. Resuming line following.")
                         self.stop()
                         break

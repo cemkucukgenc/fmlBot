@@ -34,6 +34,19 @@ with FMLRobot() as robot:
         except:
             # print("QR Could not be Read")
             pass
+
+        if current_task_number == -1:
+            while True:
+                robot.drive(10,300)
+                
+                ground_cam_left = robot.get_color_left()
+                if ground_cam_left == "Black":
+                    print("Black line detected. Resuming line following.")
+                    robot.follower_line()
+
+                    
+                    if ground_cam_left == "Red":
+                    
         
         if current_task_number == 1:
             task_1.doTask(robot,mqtt,camera)
