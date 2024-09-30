@@ -7,4 +7,4 @@ from FMLMqtt import FMLMqtt
 import time
 
 def doTask(robot : FMLRobot,mqtt : FMLMqtt,camera: FMLCamera):
-    pass
+    print("task1 executing")

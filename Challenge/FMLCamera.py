@@ -38,7 +38,23 @@ class FMLCamera:
 
     # return the parsed barcode thats directly in front of the roboter (takes image -> processes it -> return the result)
     def get_barcode(self):
-        pass
+        # Capture the current frame from the camera
+        frame = self.get_image_array()
+
+        # Create a QRCodeDetector object
+        qr_detector = cv2.QRCodeDetector()
+
+        # Detect and decode the QR code in the frame
+        value, points, _ = qr_detector.detectAndDecode(frame)
+
+        # Check if a QR code was detected
+        if points is not None:
+            # If a QR code is detected, print its value
+            # print(f"QR Code detected: {value}")
+            return value
+        else:
+            print("No QR Code detected")
+            return None
                
     # return the perceentage of greenish pixels in the current camera picture (takes images -> processes it -> returns the result)
     def get_green_percentage(self):

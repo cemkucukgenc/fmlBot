@@ -17,18 +17,23 @@ import task_8
 
 
 camera = FMLCamera()
-mqtt = FMLMqtt("mqttBroker","gruppeX/robot")
+mqtt = FMLMqtt("mqttBroker","gruppe6/robot")
 line_controller = PIController(0,0.00,0)
 
 done = False
 current_task_number = -1
 
 with FMLRobot() as robot:
-    while not dgone:
+    while not done:
         # reset current taks number
         current_task_number = -1
-        
-        # TODO add code to read in the task number somehow and drive between the tasks
+
+        current_task_number = camera.get_barcode()
+        try:
+            current_task_number = int(current_task_number)
+        except:
+            # print("QR Could not be Read")
+            pass
         
         if current_task_number == 1:
             task_1.doTask(robot,mqtt,camera)
