@@ -328,7 +328,7 @@ class FMLRobot:
                     ground_color = self.get_color_left()
 
 
-                    print('right: {}, left: {}'.format(current_sensor_value, ground_color))
+                    # print('right: {}, left: {}'.format(current_sensor_value, ground_color))
                     
 
                     # Check if the ground color is black to transition back to line following
