@@ -148,10 +148,10 @@ class FMLRobot:
     
         return distance
     
-    def get_distance_right(self):
+    def get_distance_side(self):
         try:
             # read sensor 
-            distance = self.BP.get_sensor(self.right_sensor)
+            distance = self.BP.get_sensor(self.side_sensor)
             distance = distance + 1 # Distance correction
         except brickpi3.SensorError as error:
             # Default wert
@@ -259,9 +259,39 @@ class FMLRobot:
 
         
     
-    def follower_distance(self, velocity, controller, colors_to_stop=[]):
-        pass
-    
+    def bypass_obstacle(self, controller, velocity):
+        front_obstacle_detected = False
+
+           
+            while True:
+                try:
+                    side_distance = self.get_distance_side()
+
+                    u = controller.get_u(side_distance)
+                    
+                    # Limit u to 500
+                    if velocity + abs(u) > 500:
+                        if u >= 0:
+                            u = 500 - velocity
+                        else:
+                            u = velocity - 500
+
+                    # Run motors with correction
+                    if u >= 0:
+                        self.BP.set_motor_dps(self.right_motor, velocity + abs(u))
+                        self.BP.set_motor_dps(self.left_motor, velocity - abs(u))
+                    else:
+                        self.BP.set_motor_dps(self.right_motor, velocity - abs(u))
+                        self.BP.set_motor_dps(self.left_motor, velocity + abs(u))
+                    
+                    time.sleep(0.01)
+                   
+
+
+                except brickpi3.SensorError as error:
+                    print(f"Error during sensor reading: {error}")
+                    continue
+
 
     # read and display the current voltages
     def print_battery_status(self):
