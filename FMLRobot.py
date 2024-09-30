@@ -258,17 +258,87 @@ class FMLRobot:
                 continue
 
         
-    
-    def bypass_obstacle(self, controller, velocity):
-        front_obstacle_detected = False
+    def bypass_obstacle(self, controller_line_following, controller_bypass_obstacle, velocity):
+        # Step 1: Follow the line until an obstacle is detected 12cm in front
+        while True:
+            print("Starting line tracking until obstacle is detected.")
+            while True:
+                try:
+                    # Track the black line using the follower_line logic until an obstacle is detected
+                    front_distance = self.get_distance_front()
+                    current_sensor_value = self.BP.get_sensor(self.right_sensor)
+                    ground_color = self.get_color_left()
 
-           
+                    if front_distance != -1 and front_distance <= 12:  # Stop if an obstacle is detected 12cm ahead
+                        print("Obstacle detected 12cm ahead. Preparing to bypass.")
+                        self.stop()
+                        break
+
+                    u = controller_line_following.get_u(current_sensor_value)
+                    # Limit u to 500
+                    if velocity + abs(u) > 500:
+                        if u >= 0:
+                            u = 500 - velocity
+                        else:
+                            u = velocity - 500
+
+                    # Run motors with correction
+                    if u >= 0:
+                        self.BP.set_motor_dps(self.right_motor, velocity - abs(u))
+                        self.BP.set_motor_dps(self.left_motor, velocity + abs(u))
+                    else:
+                        self.BP.set_motor_dps(self.right_motor, velocity + abs(u))
+                        self.BP.set_motor_dps(self.left_motor, velocity - abs(u))
+
+                    time.sleep(0.01)
+
+                except brickpi3.SensorError as error:
+                    print(f"Error during sensor reading: {error}")
+                    continue
+
+            # Step 2: Turn -60 degrees and go straight until the side distance is exactly 15cm
+            print("Turning -60 degrees.")
+            self.turn(-60)
+            print("Going straight until side distance is 15cm.")
+            while True:
+                try:
+                    # Move forward until the side distance is exactly 15cm
+                    self.BP.set_motor_dps(self.left_motor, velocity)
+                    self.BP.set_motor_dps(self.right_motor, velocity)
+
+                    side_distance = self.get_distance_side()
+                    if side_distance != -1 and abs(side_distance - 15) <= 1:  # Allow for slight error in measurement
+                        print(f"Side distance is now 15cm. Stopping.")
+                        self.stop()
+                        break
+
+                    time.sleep(0.01)
+
+                except brickpi3.SensorError as error:
+                    print(f"Error during sensor reading: {error}")
+                    continue
+
+            # Step 3: Circumvent the obstacle using the current behavior until the black line is detected
+            print("Starting obstacle avoidance by maintaining a constant side distance.")
             while True:
                 try:
                     side_distance = self.get_distance_side()
 
-                    u = controller.get_u(side_distance)
+                    current_sensor_value = self.BP.get_sensor(self.right_sensor)
+                    ground_color = self.get_color_left()
+
+
+                    print('right: {}, left: {}'.format(current_sensor_value, ground_color))
                     
+
+                    # Check if the ground color is black to transition back to line following
+                    if ground_color == "Black":
+                        print("Black line detected. Resuming line following.")
+                        self.stop()
+                        break
+
+                    # Use side distance to control movement around the obstacle
+                    u = controller_bypass_obstacle.get_u(side_distance)
                     # Limit u to 500
                     if velocity + abs(u) > 500:
                         if u >= 0:
@@ -283,10 +353,8 @@ class FMLRobot:
                     else:
                         self.BP.set_motor_dps(self.right_motor, velocity - abs(u))
                         self.BP.set_motor_dps(self.left_motor, velocity + abs(u))
-                    
-                    time.sleep(0.01)
-                   
 
+                    time.sleep(0.01)
 
                 except brickpi3.SensorError as error:
                     print(f"Error during sensor reading: {error}")
