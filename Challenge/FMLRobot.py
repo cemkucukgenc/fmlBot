@@ -121,8 +121,8 @@ class FMLRobot:
     # To be implemented in 1.1
     def drive(self, distance, velocity):
 
-        self.BP.set_motor_dps(self.right_motor, velocity)
-        self.BP.set_motor_dps(self.left_motor, velocity)
+        # self.BP.set_motor_dps(self.right_motor, velocity)
+        # self.BP.set_motor_dps(self.left_motor, velocity)
 
         # needed motor rotation to achieve movement
         delta_angle = (distance * self.gear_ratio * 360) / self.wheel_circumference
@@ -135,7 +135,7 @@ class FMLRobot:
         # read motor veloctiy until zero --> robot stands -> we can return from the function
         while self.BP.get_motor_status(self.left_motor)[3] != 0:
             time.sleep(0.02)
-
+        self.stop()
         self.update_position()
         
     def drive_stop_at_color(self, velocity):
@@ -249,9 +249,7 @@ class FMLRobot:
                 # get_ground_cam_right_output = self.get_ground_cam_right()
                 get_ground_cam_left_output = self.get_ground_cam_left()
                 
-
-
-                print('ground cam left detection at FMLROBOT.py: {}'.format(ground_cam_left))
+                # print('ground cam left detection at FMLROBOT.py: {}'.format(ground_cam_left))
                 
                 if (ground_cam_left == 2 or ground_cam_left == 3 or ground_cam_left == 4 or ground_cam_left==5):
                     print(f"Non-black/white ground detected (color code: {ground_cam_left}). Stopping.")
