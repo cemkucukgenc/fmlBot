@@ -58,7 +58,25 @@ class FMLCamera:
                
     # return the perceentage of greenish pixels in the current camera picture (takes images -> processes it -> returns the result)
     def get_green_percentage(self):
-        pass
+        # Capture the current frame from the camera
+        frame = self.get_image_array()
+
+        # Convert the frame to HSV color space
+        hsv_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+
+        # Define the range for green color in HSV
+        lower_green = np.array([35, 100, 100])
+        upper_green = np.array([85, 255, 255])
+
+        # Create a binary mask where green colors are detected
+        green_mask = cv2.inRange(hsv_frame, lower_green, upper_green)
+
+        # Calculate the percentage of green pixels in the image
+        green_pixels = np.count_nonzero(green_mask)
+        total_pixels = green_mask.size
+        green_percentage = (green_pixels / total_pixels) * 100
+
+        return green_percentage
 
     # returns a list of shapes recognized in the picture. The image is provided via a path saved to harddisk (mainly because image resultion is higher this way)
     # (load picture -> process it -> generate list of shapes -> return them)

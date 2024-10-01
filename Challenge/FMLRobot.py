@@ -138,6 +138,33 @@ class FMLRobot:
 
         self.update_position()
         
+    def drive_stop_at_color(self, velocity):
+
+        self.BP.set_motor_dps(self.right_motor, velocity)
+        self.BP.set_motor_dps(self.left_motor, velocity)
+
+        while True:
+            # needed motor rotation to achieve movement
+            distance = 1
+            delta_angle = (distance * self.gear_ratio * 360) / self.wheel_circumference
+            # add angle to current motor position
+            self.BP.set_motor_position_relative(self.left_motor, delta_angle)
+            self.BP.set_motor_position_relative(self.right_motor, delta_angle)
+
+            ground_cam_left = self.BP.get_sensor(self.left_sensor)
+
+            if not (ground_cam_left == 0 or ground_cam_left == 1 or ground_cam_left == 6):
+                print(f"Non-black/white ground detected (color code: {ground_cam_left}). Stopping.")
+                self.stop()
+                break
+            
+            # give motors some time to spin
+            time.sleep(0.1)
+            # read motor veloctiy until zero --> robot stands -> we can return from the function
+            while self.BP.get_motor_status(self.left_motor)[3] != 0:
+                time.sleep(0.02)
+
+            self.update_position()        
 
     # To be implemented in 2.1
     def get_distance_front(self):
@@ -166,23 +193,23 @@ class FMLRobot:
 
     
     # To be implemented in 2.1
-    def get_color_left(self):
+    def get_ground_cam_left(self):
         try:
             color = self.BP.get_sensor(self.left_sensor) # Read in sensor
         # If brickpy sensor throws error set default value
         except brickpi3.SensorError as error:
             color = None # Default Value and print error
-            print(f"Error during get_color_left(): {error}")
+            print(f"Error during get_ground_cam_left(): {error}")
     
         return self.colors[color]
     
     # To be implemented in 2.1    
-    def get_color_right(self):
+    def get_ground_cam_right(self):
         try:
             color = self.BP.get_sensor(self.right_sensor) # Read in sensor
         except brickpi3.SensorError as error:
             color = None 
-            print(f"Error during get_color_right(): {error}")
+            print(f"Error during get_ground_cam_right(): {error}")
     
         return self.colors[color]
 
@@ -217,11 +244,19 @@ class FMLRobot:
             try:
                 # Get reflected light from the right sensor for line tracking
                 ground_cam_right = self.BP.get_sensor(self.right_sensor)
+                ground_cam_left = self.BP.get_sensor(self.left_sensor)
+
+                get_ground_cam_right_output = self.get_ground_cam_right()
+                get_ground_cam_left_output = self.get_ground_cam_left()
                 
-                # if not (ground_cam_left == 0 or ground_cam_left == 1 or ground_cam_left == 6):
-                #     print(f"Non-black/white ground detected (color code: {ground_cam_left}). Stopping.")
-                #     self.stop()
-                #     break
+
+
+                print('ground cam left detection at FMLROBOT.py: {}'.format(ground_cam_left))
+                
+                if not (ground_cam_left == 0 or ground_cam_left == 1 or ground_cam_left == 6):
+                    print(f"Non-black/white ground detected (color code: {ground_cam_left}). Stopping.")
+                    self.stop()
+                    break
 
                 # Calculate steering using the Controller algorithm
                 u = controller.get_u(ground_cam_right)
@@ -257,7 +292,7 @@ class FMLRobot:
                     # Track the black line using the follower_line logic until an obstacle is detected
                     front_distance = self.get_distance_front()
                     ground_cam_right = self.BP.get_sensor(self.right_sensor)
-                    ground_cam_left = self.get_color_left()
+                    ground_cam_left = self.get_ground_cam_left()
 
                     if front_distance != -1 and front_distance <= 12:  # Stop if an obstacle is detected 12cm ahead
                         print("Obstacle detected 12cm ahead. Preparing to bypass.")
@@ -315,7 +350,7 @@ class FMLRobot:
                     side_distance = self.get_distance_side()
 
                     ground_cam_right = self.BP.get_sensor(self.right_sensor)
-                    ground_cam_left = self.get_color_left()
+                    ground_cam_left = self.get_ground_cam_left()
 
 
                     # print('right: {}, left: {}'.format(ground_cam_right, ground_cam_left))
