@@ -29,10 +29,10 @@ with FMLRobot() as robot:
         current_task_number = -1
 
         if current_task_number == -1:
-
+            print("task number -1")
             controller_line_following = PIController(kp=7.0,ki=0.02,target_value=30.0)
             robot.follower_line(velocity=300, controller=controller_line_following)
-            ground_cam_left = robot.get_color_left()
+            ground_cam_left = robot.get_ground_cam_left()
             print('detected color: {}'.format(ground_cam_left))
 
             if ground_cam_left == "Red":
@@ -40,23 +40,22 @@ with FMLRobot() as robot:
                 # print(camera.get_image_array())
                 while True:
                     current_task_number = camera.get_barcode()
-                    if current_task_number.isdigit():  # Check if the returned string is a number
+                    if robot.is_integer(current_task_number):  # Check if the returned string is a number
                         current_task_number = int(current_task_number)  # Convert to an integer
                         break  # Break the loop when a valid integer is obtained
 
-                print('detected task number: {}'.format(current_task_number))
+                # print('detected task number: {}'.format(current_task_number))
                 robot.turn(90)
                 
         if current_task_number == 1:
             # To have the qr code for the 2nd task
-            while True:
-                payload_ID = camera.get_barcode()
-                if payload_ID.isdigit():  # Check if the returned string is a number
-                    payload_ID = int(payload_ID)  # Convert to an integer
-                    break  # Break the loop when a valid integer is obtained
-                
             task_1.doTask(robot,mqtt,camera)
         if current_task_number == 2:
+            while True:
+                payload_ID = camera.get_barcode()
+                if robot.is_integer(payload_ID):  # Check if the returned string is a number
+                    payload_ID = int(payload_ID)  # Convert to an integer
+                    break  # Break the loop when a valid integer is obtained
             task_2.doTask(robot,mqtt,camera)
         if current_task_number == 3:
             task_3.doTask(robot,mqtt,camera)

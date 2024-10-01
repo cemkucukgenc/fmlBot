@@ -82,12 +82,12 @@ def get_path_colors(path, path_colors):
             color_list.append(segment_color)
     return color_list
 
-# Example usage with the Dijkstra path
-start = "a"
-end = "n"
-path = dijkstra(graph, start, end)
-print("Shortest path from {} to {}:".format(start, end), path)
+# # Example usage with the Dijkstra path
+# start = "a"
+# end = "n"
+# path = dijkstra(graph, start, end)
+# print("Shortest path from {} to {}:".format(start, end), path)
 
-# Get the color list for the path
-color_list = get_path_colors(path, path_colors)
-print("Color list for the path {}: {}".format(path, color_list))
+# # Get the color list for the path
+# color_list = get_path_colors(path, path_colors)
+# print("Color list for the path {}: {}".format(path, color_list))

@@ -246,14 +246,14 @@ class FMLRobot:
                 ground_cam_right = self.BP.get_sensor(self.right_sensor)
                 ground_cam_left = self.BP.get_sensor(self.left_sensor)
 
-                get_ground_cam_right_output = self.get_ground_cam_right()
+                # get_ground_cam_right_output = self.get_ground_cam_right()
                 get_ground_cam_left_output = self.get_ground_cam_left()
                 
 
 
                 print('ground cam left detection at FMLROBOT.py: {}'.format(ground_cam_left))
                 
-                if not (ground_cam_left == 0 or ground_cam_left == 1 or ground_cam_left == 6):
+                if (ground_cam_left == 2 or ground_cam_left == 3 or ground_cam_left == 4 or ground_cam_left==5):
                     print(f"Non-black/white ground detected (color code: {ground_cam_left}). Stopping.")
                     self.stop()
                     break
@@ -385,11 +385,15 @@ class FMLRobot:
                     print(f"Error during sensor reading: {error}")
                     continue
 
+    def is_integer(self, x):
+        try:
+            int(x)
+            return True
+        except:
+            return False
 
     # read and display the current voltages
     def print_battery_status(self):
         print("Battery voltage: %6.3f  9v voltage: %6.3f  5v voltage: %6.3f  3.3v voltage: %6.3f" % (self.BP.get_voltage_battery(), self.BP.get_voltage_9v(), self.BP.get_voltage_5v(), self.BP.get_voltage_3v3())) 
 
-       
-        
 
