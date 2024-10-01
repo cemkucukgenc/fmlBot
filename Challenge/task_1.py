@@ -8,7 +8,6 @@ from FMLController import PIController
 import time
 
 def doTask(robot : FMLRobot,mqtt : FMLMqtt,camera: FMLCamera):
-    print("task1 executing")
 
     while True:
         green_percentage = camera.get_green_percentage()

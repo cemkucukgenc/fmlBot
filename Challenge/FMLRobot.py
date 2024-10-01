@@ -154,7 +154,7 @@ class FMLRobot:
             ground_cam_left = self.BP.get_sensor(self.left_sensor)
 
             if not (ground_cam_left == 0 or ground_cam_left == 1 or ground_cam_left == 6):
-                print(f"Non-black/white ground detected (color code: {ground_cam_left}). Stopping.")
+                # print(f"Non-black/white ground detected (color code: {ground_cam_left}). Stopping.")
                 self.stop()
                 break
             
@@ -252,7 +252,7 @@ class FMLRobot:
                 # print('ground cam left detection at FMLROBOT.py: {}'.format(ground_cam_left))
                 
                 if (ground_cam_left == 2 or ground_cam_left == 3 or ground_cam_left == 4 or ground_cam_left==5):
-                    print(f"Non-black/white ground detected (color code: {ground_cam_left}). Stopping.")
+                    # print(f"Non-black/white ground detected (color code: {ground_cam_left}). Stopping.")
                     self.stop()
                     break
 
