@@ -87,4 +87,40 @@ class FMLCamera:
     # But here its really open to you what you want to control with the P-PI Controller. 
     # Remind yourself that you can get the position of a barcode also from the Scanner() lib.
     def get_qr_position(self):
-        pass
+        # Capture the current frame from the camera
+        frame = self.get_image_array()
+
+        # Print the shape of the frame to understand its dimensions
+        frame_height, frame_width, _ = frame.shape
+        # print(f"Frame dimensions: width = {frame_width}, height = {frame_height}")
+
+        # Calculate the frame center based on the dimensions
+        frame_center_x = frame_width / 2
+        frame_center_y = frame_height / 2
+        # print(f"Frame center: x = {frame_center_x}, y = {frame_center_y}")
+
+        # Create a QRCodeDetector object
+        qr_detector = cv2.QRCodeDetector()
+
+        # Detect and decode the QR code in the frame
+        value, points, _ = qr_detector.detectAndDecode(frame)
+
+        # Check if a QR code was detected
+        if points is not None:
+            # Calculate the center of the QR code bounding box
+            x_coords = [p[0] for p in points[0]]
+            y_coords = [p[1] for p in points[0]]
+            qr_center_x = sum(x_coords) / len(x_coords)
+            qr_center_y = sum(y_coords) / len(y_coords)
+
+            # Calculate the offset of the QR code's center from the frame's center
+            x_offset = qr_center_x - frame_center_x
+            y_offset = qr_center_y - frame_center_y
+
+            print(f"QR Code center: ({qr_center_x}, {qr_center_y})")
+            print(f"QR Code offset from center: x = {x_offset}, y = {y_offset}")
+
+            return x_offset, y_offset
+        else:
+            print("No QR Code detected in the frame.")
+            return None
