@@ -14,7 +14,7 @@ def go_to_color(robot, color_list, ground_cam_left):
 
     len_color_list = len(color_list)
     i = 0
-    while i < len_color_list-1:
+    while i < len_color_list:
         target_color = color_list[i]
         print ("Next point is : {}".format(target_color))
 
@@ -30,7 +30,7 @@ def go_to_color(robot, color_list, ground_cam_left):
             robot.drive(distance=0.10, velocity=300)
             time.sleep(0.5)
             controller_line_following = PIController(kp=7.0, ki=0.02, target_value=30.0)
-            robot.follower_line(velocity=200, controller=controller_line_following)
+            robot.follower_line(velocity=300, controller=controller_line_following)
             i = i+1
 
             # Update ground_cam_left after moving
@@ -55,6 +55,7 @@ def doTask(robot: FMLRobot, mqtt: FMLMqtt, camera: FMLCamera):
 
     while True:
         start_point = "a"
+        mid_point = "g"
         end_point = "n"
         color_list = get_path_color_list(start_point, end_point, graph, path_colors)
         print(color_list)
