@@ -318,10 +318,59 @@ class FMLRobot:
                 print(f"Error during sensor reading: {error}")
                 continue
 
+    def follower_line_short_distance(self, velocity, controller):
+        print("Line following started")
+
+        # Record the starting time
+
+        while True:
+            try:
+                # Get the elapsed time since the function started
+
+                # Get reflected light from the right sensor for line tracking
+                ground_cam_right = self.BP.get_sensor(self.right_sensor)
+                
+                # Only check the ground color condition after 1 second has passed
+
+                velocity = 200
+                ground_cam_left = self.get_ground_cam_left()
+
+                # Stop if a specific ground color is detected
+                if ground_cam_left in ["Blue", "Green", "Yellow", "Red"]:
+                    self.stop()
+                    print(f"Line following ended because color: {ground_cam_left} detected.")
+                    break
+
+                # Calculate steering using the Controller algorithm
+                u = controller.get_u(ground_cam_right)
+
+                # Limit u to 500
+                if velocity + abs(u) > 500:
+                    u = 500 - velocity if u >= 0 else velocity - 500
+
+                # Run motors with correction
+                if u >= 0:
+                    self.BP.set_motor_dps(self.right_motor, velocity - abs(u))
+                    self.BP.set_motor_dps(self.left_motor, velocity + abs(u))
+                else:
+                    self.BP.set_motor_dps(self.right_motor, velocity + abs(u))
+                    self.BP.set_motor_dps(self.left_motor, velocity - abs(u))
+
+                time.sleep(0.1)
+
+            except brickpi3.SensorError as error:
+                print(f"Error during sensor reading: {error}")
+                continue
+
 
         
     def bypass_obstacle(self, controller_line_following, controller_bypass_obstacle, velocity):
         # Step 1: Follow the line until an obstacle is detected 12cm in front
+        # time.sleep(0.01)
+        # ground_cam_left = self.get_ground_cam_left()
+        # print(ground_cam_left)
+        # if ground_cam_left == "Red" or ground_cam_left == "Yellow":
+        #     break
         while True:
             print("Starting line tracking until obstacle is detected.")
             while True:
@@ -330,6 +379,11 @@ class FMLRobot:
                     front_distance = self.get_distance_front()
                     ground_cam_right = self.BP.get_sensor(self.right_sensor)
                     ground_cam_left = self.get_ground_cam_left()
+
+                    if front_distance != -1 and front_distance <= 12:  # Stop if an obstacle is detected 12cm ahead
+                        print("Obstacle detected 12cm ahead. Waiting for 10 seconds")
+                        self.stop()
+                        time.sleep(10)
 
                     if front_distance != -1 and front_distance <= 12:  # Stop if an obstacle is detected 12cm ahead
                         print("Obstacle detected 12cm ahead. Preparing to bypass.")
@@ -417,6 +471,7 @@ class FMLRobot:
                         self.BP.set_motor_dps(self.left_motor, velocity + abs(u))
 
                     time.sleep(0.01)
+
 
                 except brickpi3.SensorError as error:
                     print(f"Error during sensor reading: {error}")

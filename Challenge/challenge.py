@@ -21,9 +21,12 @@ mqtt = FMLMqtt("mqttBroker","gruppe6/robot")
 line_controller = PIController(0,0.00,0)
 
 done = False
-current_task_number = -1
+current_task_number = 6
+
 
 with FMLRobot() as robot:
+    ground_cam_left = robot.get_ground_cam_left()
+
     while not done:
         # reset current taks number
         
@@ -54,10 +57,24 @@ with FMLRobot() as robot:
             print("Task 3 Executing")
             task_3.doTask(robot,mqtt,camera)
         if current_task_number == 4:
+            print("Task 4 Executing")
             task_4.doTask(robot,mqtt,camera)
+            while True:
+                current_task_number = camera.get_barcode()
+                if robot.is_integer(current_task_number):  # Check if the returned string is a number
+                    current_task_number = int(current_task_number)  # Convert to an integer
+                    break  # Break the loop when a valid integer is obtained
+            robot.turn(90)
         if current_task_number == 5:
+            print("Task 5 Executing")
             task_5.doTask(robot,mqtt,camera)
+            while True:
+                current_task_number = camera.get_barcode()
+                if robot.is_integer(current_task_number):  # Check if the returned string is a number
+                    current_task_number = int(current_task_number)  # Convert to an integer
+                    break  # Break the loop when a valid integer is obtained
         if current_task_number == 6:
+            print("Task 6 Executing")
             task_6.doTask(robot,mqtt,camera)
         if current_task_number == 7:
             task_7.doTask(robot,mqtt,camera)
