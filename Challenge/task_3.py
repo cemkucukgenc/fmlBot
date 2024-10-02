@@ -93,7 +93,7 @@ def doTask(robot: FMLRobot, mqtt: FMLMqtt, camera: FMLCamera):
             ground_cam_left = robot.get_ground_cam_left()
             print(f'detected color: {ground_cam_left}')
             if ground_cam_left == "Red":
-                robot.drive(distance=0.13, velocity=300)
+                robot.drive(distance=0.16, velocity=300)
                 print("Task 3 Ended")
                 break
 
