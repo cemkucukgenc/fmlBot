@@ -55,7 +55,7 @@ def doTask(robot: FMLRobot, mqtt: FMLMqtt, camera: FMLCamera):
 
     while True:
         start_point = "a"
-        mid_point = "g"
+        mid_point = "i"
         end_point = "n"
         
         

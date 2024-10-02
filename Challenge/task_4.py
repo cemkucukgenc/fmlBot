@@ -52,6 +52,8 @@ def doTask(robot : FMLRobot,mqtt : FMLMqtt,camera: FMLCamera):
     # Disconnect when finished
     mqtt_client.disconnect()
 
+    return received_shape
+
 
 
 

@@ -453,6 +453,7 @@ class FMLRobot:
                         self.stop()
                         break
 
+
                     # Use side distance to control movement around the obstacle
                     u = controller_bypass_obstacle.get_u(side_distance)
                     # Limit u to 500
@@ -476,6 +477,7 @@ class FMLRobot:
                 except brickpi3.SensorError as error:
                     print(f"Error during sensor reading: {error}")
                     continue
+            break
 
     def is_integer(self, x):
         try:
