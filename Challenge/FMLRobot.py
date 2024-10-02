@@ -286,7 +286,7 @@ class FMLRobot:
                 ground_cam_right = self.BP.get_sensor(self.right_sensor)
                 
                 # Only check the ground color condition after 1 second has passed
-                if elapsed_time > 1:
+                if elapsed_time > 0.5:
 
                     velocity = 200
                     ground_cam_left = self.get_ground_cam_left()

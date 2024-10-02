@@ -57,11 +57,47 @@ def doTask(robot: FMLRobot, mqtt: FMLMqtt, camera: FMLCamera):
         start_point = "a"
         mid_point = "g"
         end_point = "n"
-        color_list = get_path_color_list(start_point, end_point, graph, path_colors)
-        print(color_list)
         
-        # Pass the ground_cam_left value to the go_to_color function
+        
+        color_list = get_path_color_list(start_point, mid_point, graph, path_colors)
+        print(color_list)
         go_to_color(robot, color_list, ground_cam_left)
+
+
+
+        print("Dropping Process Started")
+        print ("Color Green searching")
+        while True:
+            robot.turn(20)
+            time.sleep(0.1)
+            ground_cam_left = robot.get_ground_cam_left()
+            print(f'detected color: {ground_cam_left}')
+            if ground_cam_left == "Green":
+                print("Green Found Goind Forward")
+                robot.drive(distance=0.10, velocity=300)
+                robot.drop_fork()
+                time.sleep(0.1)
+                robot.drive(distance=-0.10, velocity=300)
+                robot.lift_fork()
+                time.sleep(0.1)
+                break
+
+        color_list = get_path_color_list(mid_point, end_point, graph, path_colors)
+        print(color_list)
+        go_to_color(robot, color_list, ground_cam_left)
+
+
+        while True:
+            robot.turn(20)
+            time.sleep(0.1)
+            ground_cam_left = robot.get_ground_cam_left()
+            print(f'detected color: {ground_cam_left}')
+            if ground_cam_left == "Red":
+                robot.drive(distance=0.13, velocity=300)
+                print("Task 3 Ended")
+                break
+
+        break
 
 
 
