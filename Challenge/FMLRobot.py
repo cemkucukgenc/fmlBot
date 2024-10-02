@@ -272,31 +272,35 @@ class FMLRobot:
 
     ## Followers:
     def follower_line(self, velocity, controller):
-        print("line following started")
+        print("Line following started")
+
+        # Record the starting time
+        start_time = time.time()
+
         while True:
             try:
+                # Get the elapsed time since the function started
+                elapsed_time = time.time() - start_time
+
                 # Get reflected light from the right sensor for line tracking
                 ground_cam_right = self.BP.get_sensor(self.right_sensor)
-                ground_cam_left = self.get_ground_cam_left()
+                
+                # Only check the ground color condition after 1 second has passed
+                if elapsed_time > 1:
+                    ground_cam_left = self.get_ground_cam_left()
 
-                
-                # print('ground cam left detection at FMLROBOT.py: {}'.format(ground_cam_left))
-                
-                if (ground_cam_left == "Blue" or ground_cam_left == "Green" or ground_cam_left == "Yellow" or ground_cam_left=="Red"):
-                    # print(f"Non-black/white ground detected (color code: {ground_cam_left}). Stopping.")
-                    self.stop()
-                    print("Line following ended because color: {} detected".format(ground_cam_left))
-                    break
+                    # Stop if a specific ground color is detected
+                    if ground_cam_left in ["Blue", "Green", "Yellow", "Red"]:
+                        self.stop()
+                        print(f"Line following ended because color: {ground_cam_left} detected.")
+                        break
 
                 # Calculate steering using the Controller algorithm
                 u = controller.get_u(ground_cam_right)
-                
+
                 # Limit u to 500
                 if velocity + abs(u) > 500:
-                    if u >= 0:
-                        u = 500 - velocity
-                    else:
-                        u = velocity - 500
+                    u = 500 - velocity if u >= 0 else velocity - 500
 
                 # Run motors with correction
                 if u >= 0:
@@ -305,12 +309,13 @@ class FMLRobot:
                 else:
                     self.BP.set_motor_dps(self.right_motor, velocity + abs(u))
                     self.BP.set_motor_dps(self.left_motor, velocity - abs(u))
-                
+
                 time.sleep(0.1)
 
             except brickpi3.SensorError as error:
                 print(f"Error during sensor reading: {error}")
                 continue
+
 
         
     def bypass_obstacle(self, controller_line_following, controller_bypass_obstacle, velocity):
