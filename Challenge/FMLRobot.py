@@ -151,7 +151,7 @@ class FMLRobot:
             self.BP.set_motor_position_relative(self.left_motor, delta_angle)
             self.BP.set_motor_position_relative(self.right_motor, delta_angle)
 
-            ground_cam_left = self.BP.get_sensor(self.left_sensor)
+            ground_cam_left = self.get_ground_cam_left()
 
             if not (ground_cam_left == 0 or ground_cam_left == 1 or ground_cam_left == 6):
                 # print(f"Non-black/white ground detected (color code: {ground_cam_left}). Stopping.")
@@ -192,16 +192,48 @@ class FMLRobot:
         return distance
 
     
-    # To be implemented in 2.1
-    def get_ground_cam_left(self):
-        try:
-            color = self.BP.get_sensor(self.left_sensor) # Read in sensor
-        # If brickpy sensor throws error set default value
-        except brickpi3.SensorError as error:
-            color = None # Default Value and print error
-            print(f"Error during get_ground_cam_left(): {error}")
+    # # To be implemented in 2.1
+    # def get_ground_cam_left(self):
+    #     try:
+    #         color = self.BP.get_sensor(self.left_sensor) # Read in sensor
+    #     # If brickpy sensor throws error set default value
+    #     except brickpi3.SensorError as error:
+    #         color = None # Default Value and print error
+    #         print(f"Error during get_ground_cam_left(): {error}")
     
-        return self.colors[color]
+    #     return self.colors[color]
+
+    def get_ground_cam_left(self):
+            consecutive_color_count = 0
+            stable_color = None
+
+            # Initialize with a reasonable limit for number of consecutive reads
+            stability_threshold = 20
+
+            try:
+                # Continuously read the sensor until the stability threshold is met
+                while consecutive_color_count < stability_threshold:
+                    # Read the sensor value
+                    color = self.BP.get_sensor(self.left_sensor)
+
+                    # Map the color index to its name
+                    color_name = self.colors.get(color, 'unknown')
+
+                    # Check if the stable color is the same as the currently read color
+                    if stable_color == color_name:
+                        consecutive_color_count += 1
+                    else:
+                        # Reset counter and update stable color if it's different
+                        stable_color = color_name
+                        consecutive_color_count = 1
+
+            except brickpi3.SensorError as error:
+                # Handle sensor error, assign 'unknown' as default
+                stable_color = 'unknown'
+                print(f"Error during get_ground_cam_left(): {error}")
+
+            # Return the stable color
+            return stable_color
     
     # To be implemented in 2.1    
     def get_ground_cam_right(self):
@@ -240,20 +272,20 @@ class FMLRobot:
 
     ## Followers:
     def follower_line(self, velocity, controller):
+        print("line following started")
         while True:
             try:
                 # Get reflected light from the right sensor for line tracking
                 ground_cam_right = self.BP.get_sensor(self.right_sensor)
-                ground_cam_left = self.BP.get_sensor(self.left_sensor)
+                ground_cam_left = self.get_ground_cam_left()
 
-                # get_ground_cam_right_output = self.get_ground_cam_right()
-                get_ground_cam_left_output = self.get_ground_cam_left()
                 
                 # print('ground cam left detection at FMLROBOT.py: {}'.format(ground_cam_left))
                 
-                if (ground_cam_left == 2 or ground_cam_left == 3 or ground_cam_left == 4 or ground_cam_left==5):
+                if (ground_cam_left == "Blue" or ground_cam_left == "Green" or ground_cam_left == "Yellow" or ground_cam_left=="Red"):
                     # print(f"Non-black/white ground detected (color code: {ground_cam_left}). Stopping.")
                     self.stop()
+                    print("Line following ended because color: {} detected".format(ground_cam_left))
                     break
 
                 # Calculate steering using the Controller algorithm
@@ -274,7 +306,7 @@ class FMLRobot:
                     self.BP.set_motor_dps(self.right_motor, velocity + abs(u))
                     self.BP.set_motor_dps(self.left_motor, velocity - abs(u))
                 
-                time.sleep(0.01)
+                time.sleep(0.1)
 
             except brickpi3.SensorError as error:
                 print(f"Error during sensor reading: {error}")
